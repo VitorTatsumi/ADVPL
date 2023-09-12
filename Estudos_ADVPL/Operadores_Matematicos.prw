@@ -1,6 +1,6 @@
 #INCLUDE 'protheus.ch'
 
-User Function OlaMundo()
+User Function OperadoresM()
     //Variáveis locais, geralmente utiliza-se a inicial em minúsculo referente ao tipo de dado no inicio do nome da variável
     LOCAL nVar := 2
     LOCAL nVar1 := 3
