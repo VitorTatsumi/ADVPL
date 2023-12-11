@@ -36,7 +36,7 @@ user function baixaTerceiros()
         //Leitura da Query e atribuição à variável cQuery
         cQuery := " SELECT B6_DOC AS NOTA, B6_PRODUTO AS PRODUTO, B6_SALDO AS SALDO "
         cQuery += " FROM " + RetSQLName("SB6")
-        cQuery += " WHERE B6_PRODUTO = '" + alltrim(nProd) + "' AND B6_DOC = '" + alltrim(nCod) + "' 
+        cQuery += " WHERE B6_PRODUTO = '" + alltrim(nProd) + "' AND B6_DOC = '" + alltrim(nCod) + "'"
 
         //Criação da tabela temporária TMP
         TCQuery cQuery New Alias "TMP"
