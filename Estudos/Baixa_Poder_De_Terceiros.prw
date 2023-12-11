@@ -13,6 +13,10 @@ user function baixaTerceiros()
     Local nCod := 0
     Local cQuery := ""
     Local nCount := 0
+    Local cAlias := "SB1"
+    Local cTitulo := "SALDO EM PODER DE TERCEIROS"
+    Local cExc := ".T."
+            Local cAlt := ".T."
     //Local usuNome := cUserName
     //Local aGrups := UsrRetGrp(usuID) //00045 decor
 
@@ -59,7 +63,11 @@ user function baixaTerceiros()
                     MSGINFO(aDados[nCount])
                 Endif
             Next nCount
-            
+
+            //AxCadastro é uma função para visualização de dados. Ele exibirá uma tela de cadastro já construída dentro do Protheus.
+            //Os parâmetros são: AxCadastro(Alias, Titulo, Exclur, Alterar).
+            AxCadastro(cAlias, cTitulo, cExc, cAlt)
+
             TMP->(DBCLOSEAREA())
             RestArea(aArea)
     else 
