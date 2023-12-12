@@ -2,21 +2,23 @@
 #INCLUDE 'TopConn.ch'
 #INCLUDE 'parmtype.ch'
 
-user function baixaTerceiros()
-
+user function PD3()
     //Declaração das variáveis
     //Função UsrRetGrp(__cUserID) para retornar o código de grupo do usuário parametrizado. Neste caso, o __cUserID para informar o ID do usuário corrente.
-    Local usuID := UsrRetGrp(__cUserID)
-    Local aArea := SB6->(getArea())
-    Local aDados  := {}
-    Local nProd := 0
-    Local nCod := 0
-    Local cQuery := ""
-    Local nCount := 0
-    Local cAlias := "SB1"
-    Local cTitulo := "SALDO EM PODER DE TERCEIROS"
-    Local cExc := ".T."
-            Local cAlt := ".T."
+    //Local usuID := UsrRetGrp(__cUserID)
+    Local aArea         := SB6->(getArea())
+    Local aDados        := {}
+    Local nProd         := 0
+    Local nCod          := 0
+    Local cQuery        := ""
+    Local nCount        := 0
+    Local cAlias        := "SB1"
+    Local cTitulo       := "SALDO EM PODER DE TERCEIROS"
+    Local cExc          := ".T."
+    Local cAlt          := ".T."
+    Private usuPar      := GetMV("MV_TST01")
+
+    MSGINFO(cValToChar(usuPar))
     //Local usuNome := cUserName
     //Local aGrups := UsrRetGrp(usuID) //00045 decor
 
@@ -29,7 +31,8 @@ user function baixaTerceiros()
 
     //Validação, para verificar se o usuário pertence ao grupo requerido.
     //Grupo 000045 - Promex Decor
-    If  usuID[1] == "000045"
+    //If  usuID[1] == "000045"
+    If cUserName $ usuPar
         //MSGALERT(usuID[1])
         //MSGALERT("Você pertence ao grupo " + usuID[1])
 
@@ -75,3 +78,4 @@ user function baixaTerceiros()
         
     endif
 RETURN
+
