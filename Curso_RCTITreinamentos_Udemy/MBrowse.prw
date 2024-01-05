@@ -5,7 +5,8 @@
 user function MBrowse()
     Local cAlias        := "SB6"
     Local aCores        := {}
-    Local cFiltra       := " B6_EMISSAO >= '20230101' .AND. D_E_L_E_T_ == '' "
+    //Função SToD para formatação do campo para que a comparação seja feita com os tipos de dados corretos. <SToD - String To Date>
+    Local cFiltra       := " B6_EMISSAO >= SToD('20230101') .AND. D_E_L_E_T_ == '' "
     Private cCadastro   := "MBrowser - Teste"
     Private aRotina     := {}
     Private aIndexSB6   := {}
