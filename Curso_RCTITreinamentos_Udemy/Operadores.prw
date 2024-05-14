@@ -23,8 +23,8 @@ User Function OperadoresL()
    //Será feito o teste lógico dos elementos e o MSGALERT irá exibir o resultado lógico 
     MSGALERT( nVar1 < nVar )
     MSGALERT( nVar1 > nVar )
-    MSGALERT( nVar1 = nVar )
-    MSGALERT( nVar1 == nVar )
+    MSGALERT( nVar1 = nVar ) //Comparação IGUAL. Valor x é igual ou não ao valor y.
+    MSGALERT( nVar1 == nVar ) //Comparação EXATAMENTE IGUAL. Valor x é exatamente igual ao y.
     MSGALERT( nVar1 >= nVar )
     MSGALERT( nVar1 <= nVar )
     MSGALERT( nVar1 != nVar )
@@ -56,4 +56,3 @@ User Function OperadoresM()
     MSGALERT( 'Resto de divisão: ' + cValToChar(nVar1 % nVar))
     //Foi necessário para concatenação dos elementos efetuar a conversão dos elementos para os tipos de dados corretos (Também, para facilitar, é melhor armazenar os dados em uma variável)
 RETURN
-
