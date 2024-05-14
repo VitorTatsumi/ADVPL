@@ -4,8 +4,8 @@ User Function LoopFor()
 
     //A estrutura FOR e ADVPL possui um fechamento de repetição que se chama NEXT. O NEXT irá executar o fim do processo após o loop ser finalizado.
 
-    LOCAL nCont
-    LOCAL nNum := 0
+    	LOCAL nCont
+	LOCAL nNum := 0
 	LOCAL nCont
 	LOCAL aNomes := {"Vitor", "João", "Roberth", "Maurício", "Cledison", "Cristiano", "Maurício"}
 
