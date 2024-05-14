@@ -6,7 +6,6 @@ User Function LoopFor()
 
     LOCAL nCont
     LOCAL nNum := 0
-
 	LOCAL nCont
 	LOCAL aNomes := {"Vitor", "João", "Roberth", "Maurício", "Cledison", "Cristiano", "Maurício"}
 
@@ -20,5 +19,3 @@ User Function LoopFor()
 	NEXT	
 		MsgAlert("Array percorrido por completo!")
 Return
-
-
