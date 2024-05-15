@@ -19,3 +19,16 @@ User Function LoopFor()
 	NEXT	
 		MsgAlert("Array percorrido por completo!")
 Return
+
+//Neste seguinte caso, o resultado será exibido em somente uma MsgInfo
+User Function LoopForUnion()
+    //A estrutura FOR e ADVPL possui um fechamento de repetição que se chama NEXT. O NEXT irá executar o fim do processo após o loop ser finalizado.
+	LOCAL nCont
+	LOCAL aNomes := {"Vitor", "João", "Roberth", "Maurício", "Cledison", "Cristiano", "Maurício"}
+    	LOCAL cFrase := ''
+
+	FOR nCont := 1 TO LEN(aNomes)
+        cFrase += cValToChar(aNomes[nCont]) + " - "
+	NEXT	
+        	MsgAlert(cValToChar(cFrase))
+Return
