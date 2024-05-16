@@ -17,7 +17,11 @@ O bloco pode conter parâmetros dentro dos caracteres "||", caso haja, seu valor
 user function blocoParam()
     //Bloco de código com parâmetro
     Local bBloco := {|cVar| Alert(cVar)}
-    //Eval com o valor do texto de código
+    /**
+    Eval com o valor do texto de código
+    Quando há um parâmetro sendo passado, para efetuar a atribuição do valor deve-se indicar no segundo parâmetro do eVal()
+    eVal(nomeDoBloco, conteúdoDoParâmetro)
+    **/
     eVal(bBloco, "Texto de cVar")
 RETURN
 
