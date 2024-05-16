@@ -14,7 +14,8 @@ user function ADVINHA()
         nChute := Val(FWInputBox("Digite o número: ", ""))
         //Estrutura condicional para verificação da relação das variáveis
         IF nNum == nChute
-            MSGINFO("Você acertou!" + CHR(13) + CHR(10) + "Número correto é <b>" + cValToChar(nChute) + "</b>")
+            //Pode-se utilizar algumas Tags HTML para modificar as mensagens exibidas. A Tag <br> pode ser utilizada para a quebra de linha.
+            MSGINFO("Você acertou!" + CHR(13) + CHR(10) + "<br> Número correto é <b>" + cValToChar(nChute) + "</b>")
         ELSEIF nNum < nChute
             MSGINFO("Mais baixo...")
         ELSE
