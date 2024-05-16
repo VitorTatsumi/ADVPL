@@ -2,8 +2,7 @@ RN#INCLUDE 'protheus.ch'
 
 
 //Função para iniciar o Vetor
-user function aVetor()
-
+User Function aVetor()
     //Variáveis locais
     Local dData := Date()
     //Array para armazenar diferentes tipos de dados
