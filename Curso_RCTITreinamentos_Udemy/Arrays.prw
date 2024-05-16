@@ -1,4 +1,4 @@
-#INCLUDE 'protheus.ch'
+RN#INCLUDE 'protheus.ch'
 
 
 //Função para iniciar o Vetor
@@ -11,7 +11,7 @@ user function aVetor()
 
     //Exibe o Array na sua determinada posição
     Alert(aArray[2])
-return
+RETURN
 
 //Manipulando um Vetor
 user function aVetor1()
@@ -28,7 +28,7 @@ user function aVetor1()
         //Soma +1 ao contador. 
         cCont++
     EndDo 
-return
+RETURN
 
 //Existem algumas funções de manipulação de Array em ADVPL
 
@@ -41,7 +41,7 @@ user function adiciona()
     Local aArray := {10, 20, 30}
     //Adiciona ao Vetor aArray o valor de 40 à ultima posição
     aAdd(aArray, 40)
-return
+RETURN
 
 /**
 AINS(nomeDoArray, posicaoDoArray)
@@ -55,7 +55,7 @@ user function insere()
     aIns(aArray, 4)
     //Deve ser feita a atribuição também desta forma para informar o valor atribuído
     aArray[4] := 40
-return
+RETURN
 
 /**
 ACLONE(NomeDoArray) 
