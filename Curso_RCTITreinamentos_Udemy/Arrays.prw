@@ -46,7 +46,7 @@ return
 /**
 AINS(nomeDoArray, posicaoDoArray)
 nomeDoArray[posicaoDoArray] := valor
-Esta função funciona juntamente com uma atribuição logo em seguida. Esta função insere um valor na posição do Array determinado no parâmetro. Caso não seja feita a atribuição logo em seguida, será atribuído o valor NIL à posição informada do Array.
+Esta função funciona juntamente com uma atribuição logo em seguida. Esta função insere um valor na posição do Array determinado no parâmetro. Caso não seja feita a atribuição logo em seguida, será atribuído o valor NIL/NULL à posição informada do Array.
 **/
 user function insere()
     //Cria Array com 3 posições
@@ -72,7 +72,8 @@ RETURN
 
 /**
 ADEL(nomeDoArray, posicaoDoArray)
-Esta função tem como objetivo deletar um elemento do Array de acordo com sua posição
+Esta função tem como objetivo deletar um elemento do Array de acordo com sua posição.
+O Array não irá mudar de tamanho, o registro que for deletado será atribuído seu valor como NIL
 **/
 user function deleta()
     Local aArray := {10, 20, 30}
@@ -96,7 +97,7 @@ RETURN
 
 /**
 LEN(nomeDoArray)
-Esta função retorna o tamaho do Array parametrizado.
+Esta função retorna o tamaho do Array (quantidade de índices) parametrizado.
 **/
 user function comprimento()
     Local aArray := {10, 20, 30}
