@@ -11,7 +11,7 @@ User Function TESTE01()
     
     //Fontes
     Local cFontUti    := "Tahoma"
-    Local oFontAno    := TFont():New(cFontUti,,-38)
+    Local oFontAno    := TFont():New(cFontUti,,-38) 
     Local oFontSub    := TFont():New(cFontUti,,-20)
     Local oFontSubN   := TFont():New(cFontUti,,-20,,.T.)
     Local oFontBtn    := TFont():New(cFontUti,,-14)
