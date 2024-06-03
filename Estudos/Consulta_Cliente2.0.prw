@@ -9,6 +9,7 @@ User Function TESTE01()
     Local cLinha                := CHR(13) + CHR(10)
     Local oTabelaTemp           := Nil
     Local oMarkBrowse
+    Local oDlg
     Local cTabelaTemp           := ""   
     Local aColumns              := {}    
     Local cQry                  := ""
@@ -110,10 +111,16 @@ User Function TESTE01()
     aAdd(aSeek,{"Nome" ,{{"","C",TamSX3("A1_NREDUZ")[1],0,,}} } )
 
 
+
+    oDlg := msDialog():new(180,180,600,800,'Clientes por limite de crédito',,,,,CLR_BLACK,CLR_WHITE,,,.T.)
+
+
     //Criando o FWMarkBrowse
     oMarkBrowse := FWMarkBrowse():New()
+    oMarkBrowse:SetOwner(oDlg)
+    oMarkBrowse:SetSeeAll(.T.)
     oMarkBrowse:SetAlias(cTabelaTemp)                
-    oMarkBrowse:SetDescription('Seleção Tabela Temporária')
+    oMarkBrowse:SetDescription('Seleção de Clientes')
     oMarkBrowse:DisableReport()
     oMarkBrowse:SetFieldMark( 'OK' )
     oMarkBrowse:SetTemporary(.T.)
@@ -125,10 +132,10 @@ User Function TESTE01()
 
     oMarkBrowse:AddButton("Bloquear"	, { || fBloq()},,,4, .F., 2 )
 
-
-
     //Ativando a janela
     oMarkBrowse:Activate()
+    oDlg:activate(,,,.t.,{||,.t.},,{||})
+
          
     oTabelaTemp:Delete()
     oMarkBrowse:DeActivate()
@@ -184,6 +191,8 @@ Return aColumns
 Static Function fBloq()
 
     MsgInfo("Bloquear usuário: " + (cAliasTemp)->NREDUZ, "Atenção")
+    IF(cAliasTemp->OK = "OK")
+        MsgInfo()
 Return
 
 	// //Exibe uma caixa de mensagem com um círculo vermelho e X no centro
