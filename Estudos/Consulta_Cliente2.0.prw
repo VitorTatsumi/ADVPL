@@ -25,7 +25,7 @@ User Function TESTE01()
     aAdd(aPergs, {1, "Valor em aberto: ",               nSalDup,            "@E 9 999,999.99",  ".T.",  "",     ".T.", 80,  .T.})
     aAdd(aPergs, {1, "Data da última compra (De): ",    cDataUltCompraDe,   "",                 ".T.",  "",     ""   , 60,  .F.})
     aAdd(aPergs, {1, "Data da última compra (Até): ",   cDataUltCompraAte,  "",                 ".T.",  "",     ""   , 60,  .F.})
-    aAdd(aPergs, {2, "Exibir bloqueados",              1,                  nVinc,              60,     "",     .F.})
+    aAdd(aPergs, {2, "Exibir bloqueados",               1,                  nVinc,              60,     "",     .F.})
 
     //Atribui o resultado das perguntas às respectivas variáveis
     If ParamBox(aPergs, "Informe os parâmetros")
@@ -151,10 +151,11 @@ Return
  
 
 Static Function fBuildTmp(oTabelaTemp)
- 
+    //Criação das variáveis de campo e alias da tabela temporária
     Local aFields       := {}
     Public cAliasTemp   := "TMPSA1"
-        
+    
+    //Construção da tabela temporária
     oTabelaTemp:= FWTemporaryTable():New(cAliasTemp)
 
     //Monta estrutura de campos da temporária
@@ -165,18 +166,20 @@ Static Function fBuildTmp(oTabelaTemp)
     aAdd(aFields, { "SALDUP"    , "N", TamSX3('A1_SALDUP')[01], 0})
     aAdd(aFields, { "BLOQUEIO"  , "C", TamSX3('A1_MSBLQL')[01], 0})
 
-         
+    //Define os campos da tabela temporária e Indexes
     oTabelaTemp:SetFields( aFields )
     oTabelaTemp:AddIndex("01", {"COD"})   
     oTabelaTemp:AddIndex("02", {"NREDUZ"})    
- 
+    
+    //Cria a tabela temporária
     oTabelaTemp:Create()    
- 
+
 Return oTabelaTemp:GetAlias()
  
 
 Static Function fBuildColumns()
-     
+    
+    //Criação de variáveis
     Local nX       := 0 
     Local aColumns := {}
     Local aStruct  := {}
@@ -186,8 +189,8 @@ Static Function fBuildColumns()
     AAdd(aStruct, {"NREDUZ"        , "C", TamSX3('A1_NREDUZ')[01]   , 0                     ,,            "Nome"})
     AAdd(aStruct, {"LC"            , "N", TamSX3('A1_LC')[01]       , 0 ,"@E 999,999,999.99","Limite de Crédito"})
     aAdd(aStruct, {"SALDUP"        , "N", TamSX3('A1_SALDUP')[01]   , 0 ,"@E 999,999,999.99",  "Valor em Aberto"})
-    //aAdd(aStruct, {"BLOQUEIO"      , "C", TamSX3('A1_MSBLQL')[01]   , 0                   , })
-             
+
+    //Criação das colunas com os atributos informados na estrutura             
     For nX := 2 To Len(aStruct)    
         AAdd(aColumns,FWBrwColumn():New())
         aColumns[Len(aColumns)]:SetData( &("{||"+aStruct[nX][1]+"}") )
@@ -210,15 +213,8 @@ Static Function fBloqueia()
     Local aArea     := FWGetArea()
     Local cMarca    := oMarkBrowse:Mark()
     Local nAtual    := 0
-    //Local nTotal    := 0
     Local nTotMarc  := 0
     Local nSelecao := 0
-     
-    //Define o tamanho da régua
-    // DbSelectArea(cAliasTemp)
-    // (cAliasTemp)->(DbGoTop())
-    // Count To nTotal
-    // ProcRegua(nTotal)
      
     //Percorrendo os registros
     (cAliasTemp)->(DbGoTop())
