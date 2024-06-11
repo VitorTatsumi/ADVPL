@@ -28,12 +28,14 @@ User Function TESTE01()
     aAdd(aPergs, {2, "Exibir bloqueados",               1,                  nVinc,              60,     "",     .F.})
 
     //Atribui o resultado das perguntas às respectivas variáveis
-    If ParamBox(aPergs, "Informe os parâmetros")
+    IF ParamBox(aPergs, "Informe os parâmetros")
         nLimiteC            := MV_PAR01
         nSalDup             := MV_PAR02
         cDataUltCompraDe    := MV_PAR03
         cDataUltCompraAte   := MV_PAR04
         nBloqueados         := MV_PAR05
+    ELSE
+        Return
     EndIf
      
     //Constrói estrutura da temporária
@@ -135,8 +137,9 @@ User Function TESTE01()
     oMarkBrowse:SetColumns(aColumns)
 
     //Criação dos botôes
-    oMarkBrowse:AddButton("Bloquear"	, { || fBloqueia()},,,  4, .F., 2 )
-    oMarkBrowse:AddButton("Atualizar"	, { || fAtualiza()},,,  5, .F., 2 )
+    oMarkBrowse:AddButton("Bloquear"	, { || fBloqueia()}  ,,,  4, .F., 2 )
+    oMarkBrowse:AddButton("Salvar"	    , { || fGravaDados()}  ,,,5, .F., 2 )
+    oMarkBrowse:AddButton("Desbloquear"	, { || fDesbloqueia()} ,,,6, .F., 2 )
 
     //Ativando a janela
     oMarkBrowse:Activate()
@@ -186,7 +189,7 @@ Static Function fBuildColumns()
     
     AAdd(aStruct, {"OK"            , "C", 1                         , 0                     ,,               "" })
     AAdd(aStruct, {"COD"           , "C", TamSX3('A1_COD')[01]      , 0                     ,,          "Código"})
-    AAdd(aStruct, {"NREDUZ"        , "C", TamSX3('A1_NREDUZ')[01]   , 0                     ,,            "Nome"})
+    AAdd(aStruct, {"NREDUZ"        , "C", TamSX3('A1_NREDUZ')[01]   , 1                     ,,            "Nome"})
     AAdd(aStruct, {"LC"            , "N", TamSX3('A1_LC')[01]       , 0 ,"@E 999,999,999.99","Limite de Crédito"})
     aAdd(aStruct, {"SALDUP"        , "N", TamSX3('A1_SALDUP')[01]   , 0 ,"@E 999,999,999.99",  "Valor em Aberto"})
 
@@ -203,23 +206,16 @@ Static Function fBuildColumns()
 
 Return aColumns
 
-// Static Function fBloq()
-
-//     MsgInfo("Bloquear usuário: " + (cAliasTemp)->NREDUZ, "Atenção")
-// Return
-
-
 Static Function fBloqueia()
-    Local aArea     := FWGetArea()
     Local cMarca    := oMarkBrowse:Mark()
     Local nAtual    := 0
     Local nTotMarc  := 0
-    Local nSelecao := 0
+    Local nSelecao  := 0
      
-    //Percorrendo os registros
+    //Posiciona no primeiro registro da tabela temporária
     (cAliasTemp)->(DbGoTop())
 
-
+    //Percorrendo os registros
     While ! (cAliasTemp)->(EoF())
         nAtual++
         //Caso esteja marcado
@@ -240,15 +236,91 @@ Static Function fBloqueia()
     IF nSelecao = 0
         FWAlertInfo('Selecione ao menos um registro.')
     ENDIF     
-    //Mostra a mensagem de término e caso queria fechar a dialog, basta usar o método End()
-    //FWAlertInfo('Foram bloqueados [' + cValToChar(nTotMarc) + '] registros', 'Atenção')
-    //oDlgMark:End()
- 
+
+    //Posiciona no topo da tabela temporária
+    (cAliasTemp)->(DbGoTop())
+    //Faz a atualização da MarkBrowse
+    oMarkBrowse:Refresh(.T.)
+
+    //FWRestArea(aArea)
+Return
+
+
+Static Function fDesbloqueia()
+    //Local aArea     := FWGetArea()
+    Local cMarca    := oMarkBrowse:Mark()
+    Local nAtual    := 0
+    Local nTotMarc  := 0
+    Local nSelecao  := 0
+     
+    //Percorrendo os registros
+    (cAliasTemp)->(DbGoTop())
+
+
+    While ! (cAliasTemp)->(EoF())
+        nAtual++
+        //Caso esteja marcado
+        IF oMarkBrowse:IsMark(cMarca)
+            nSelecao++
+            IF (cAliasTemp)->BLOQUEIO = "2"
+                FWAlertError('Registro já desbloqueado.', 'Atenção')
+            ELSE
+                nTotMarc++
+                (cAliasTemp)->BLOQUEIO := "2"
+                FWAlertInfo('Cliente ' + TRIM((cAliasTemp)->NREDUZ) + ' desbloqueado.', 'Atenção!')
+            ENDIF
+        EndIf
+        (cAliasTemp)->(DbSkip())
+    EndDo
+    
+    //Caso não tenha sido marcado nenhum registro, informar o usuário
+    IF nSelecao = 0
+        FWAlertInfo('Selecione ao menos um registro.')
+    ENDIF     
+
+    //Posiciona no topo da tabela temporária
+    (cAliasTemp)->(DbGoTop())
+    //Faz a atualização da MarkBrowse
+    oMarkBrowse:Refresh(.T.)
+
+Return
+
+Static Function fGravaDados()
+    Local aArea     := FWGetArea()
+    Local nAtual    := 0
+
+    dbSelectArea("SA1")
+    dbSetOrder(1) // A1_FILIAL + A1_COD + A1_LOJA
+
+    //Posiciona no topo da tabela temporária
+    (cAliasTemp)->(DbGoTop())
+
+    //Enquanto não tiver chego ao fim (EoF - End of File) da tabela temporária, faça:
+    While ! (cAliasTemp)->(EoF())
+        nAtual++
+        //Verifica no banco o registro referente ao posicionamento atual na tabela temporária
+        dbSeek(xFilial("SA1") + (cAliasTemp)-> COD )
+        IF (cAliasTemp)->BLOQUEIO = "1"
+            IF FOUND() // Avalia o retorno da pesquisa realizada
+                RECLOCK("SA1", .F.)
+                SA1->A1_MSBLQL := "1"
+                MSUNLOCK()     // Destrava o registro
+            ENDIF
+        ELSEIF (cAliasTemp)->BLOQUEIO = "2"
+            IF FOUND() // Avalia o retorno da pesquisa realizada
+                RECLOCK("SA1", .F.)
+                SA1->A1_MSBLQL := "2"
+                MSUNLOCK()     // Destrava o registro
+            ENDIF
+        ELSE
+            MsgAlert("Não foi gravado!")
+        ENDIF
+        (cAliasTemp)->(DbSkip())
+    EndDo
+
+    MsgInfo("Dados Gravados!") 
+
     FWRestArea(aArea)
 Return
 
 
-Static Function fAtualiza()
-    oMarkBrowse:Refresh(.T.)
-    //oMarkBrowse:AllMark(.F.)
-Return
