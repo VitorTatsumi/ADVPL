@@ -8,32 +8,24 @@ static oBmpNo := LoadBitmap(GetResource(), "LBNO")
  
 User Function TESTE01()
 
-    Local oDlgMain := NIL
-    Local oMsNewGet := NIL
-    Local aHeader := {}
-    Local aCmpAlt :={}
-
-
-
     //Declaração de variáveis
-    Local aArea                 := GetArea()
-    Local cLinha                := CHR(13) + CHR(10)
-    Local cTabelaTemp           := ""   
-    Local aColumns              := {}    
-    Local cQry                  := ""
+    Local oDlgMain              := NIL                  //Objeto da tela principal (MSDialog)
+    Local oMsNewGet             := NIL                  //Objeto da tela de grid (MSNewGet)
+    Local aHeader               := {}                   //Cabeçalho
+    Local aCmpAlt               :={}                    
+    Local nOpc                  := 0
     Local nValid                := 0
-    Public aCols := {}
-
-    Private oTabelaTemp         := Nil
-    Private oDlg
-    Private oMarkBrowse
-    Public nLimiteC             := 0
-    Public nSalDup              := 0
-    Public nBloqueados          := 0
-    Public aPergs               := {}
-    Public cDataUltCompraDe     := FIRSTDATE(DATE())
-    Public cDataUltCompraAte    := LASTDATE(DATE())
-    Public nVinc                := {"Sim", "Não"}
+    Public aCols                := {}
+    //Private oTabelaTemp         := Nil
+    //Private oDlg                                        
+    //Private oMarkBrowse
+    Public nLimiteC             := 0                    //Limite de crédito
+    Public nSalDup              := 0                    //Saldo de duplicatas
+    Public nBloqueados          := 0                    //Exibir bloqueados?
+    Public aPergs               := {}                   //Array das perguntas
+    Public cDataUltCompraDe     := FIRSTDATE(DATE())    //Data de última compra (De)
+    Public cDataUltCompraAte    := LASTDATE(DATE())     //Data de última compra (Até)
+    Public nVinc                := {"Sim", "Não"}       //Combobox para os bloqueados
 
     //Cria as perguntas
     aAdd(aPergs, {1, "Limite de crédito: ",             nLimiteC,           "@E 9 999,999.99",  ".T.",  "",     ".T.", 80,  .T.})
@@ -42,9 +34,8 @@ User Function TESTE01()
     aAdd(aPergs, {1, "Data da última compra (Até): ",   cDataUltCompraAte,  "",                 ".T.",  "",     ""   , 60,  .F.})
     aAdd(aPergs, {2, "Exibir bloqueados",               1,                  nVinc,              60,     "",     .F.})
 
-
-
     //Atribui o resultado das perguntas às respectivas variáveis
+    //Enquanto a validação não ocorrer, continuará solicitando a confirmação dos dados inseridos
     while nValid = 0
         IF ParamBox(aPergs, "Informe os parâmetros")
             IF FWAlertNoYes("Confirma os dados inseridos?", "Continuar?")
@@ -62,44 +53,40 @@ User Function TESTE01()
         EndIf
     End
      
-    
-
+    //Após a validação dos dados inseridos nas perguntas, irá alimentar o Array de cabeçalho com os campos das colunas.
     AADD(aHeader, {"OK",                    "CHECK",        "@BMP",                         002, 0, ".T.", "", "C"})
     AADD(aHeader, {"Bloqueio",              "A1_MSBLQL",    "@!",                           002, 0, ".T.", "", "C"})
     AADD(aHeader, {"Código",                "A1_COD",       "@!",                           30,00,  ".T.", "", "N"})
     AADD(aHeader, {"Nome",                  "A1_NREDUZ",    "@!",                           90,00,  ".T.", "", "C"})
     AADD(aHeader, {"Loja",                  "A1_LOJA",      "@!",                           30,00,  ".T.", "", "N"})
-    AADD(aHeader, {"Limite",                "A1_LC",        "@E 999,999,999,999,999,999",   30,00,  ".T.", "", "D"})
-    AADD(aHeader, {"Valor em aberto",       "A1_SALDUP",    "@E 999,999,999,999,999,999",   30,00,  ".T.", "", "D"})
+    AADD(aHeader, {"Limite",                "A1_LC",        "@E 999,999,999,999,999.999",   30,00,  ".T.", "", "D"})
+    AADD(aHeader, {"Valor em aberto",       "A1_SALDUP",    "@E 999,999,999,999,999.999",   30,00,  ".T.", "", "D"})
     
+    //Com o cabeçalho criado e as colunas definidas, alimentará o grid com as informações retornadas da função fCarregaAcols()
     Processa({|| fCarregaACols()}, "Processando")
     
     //AADD(aCols, {oBmpOK, "XYZ", 123.456, Date(), .F.})
     //AADD(aCols, {oBmpOK, "ABC", 122.566, Date(), .F.})
 
+    //Criação da tela principal, para melhor dimensionamento do oMSNewGet()
     oDlgMain := MsDialog():New(000, 000, 720, 1280, "Exemplo 01", Nil, Nil, Nil, Nil, Nil, Nil,Nil, Nil, .T., Nil, Nil, Nil, .F.)
 
     //Linha, Coluna, Largura, Altura
-    @320,012 BUTTON "Bloquear"          SIZE 060, 020 PIXEL OF oDlgMain ACTION (fBloqueia(@oMSNewGet), oMSNewGet:Refresh())
-    @320,075 BUTTON "Desbloquear"       SIZE 060, 020 PIXEL OF oDlgMain ACTION ()
-    @320,137 BUTTON "Alterar Limite"    SIZE 060, 020 PIXEL OF oDlgMain ACTION (fCarregaACols(), oMSNewGet:Refresh())
+    @320,012 BUTTON "Bloquear"          SIZE 060, 020 PIXEL OF oDlgMain ACTION (fAltera(@oMSNewGet, nOpc := 1), oMsNewGet:Refresh())
+    @320,075 BUTTON "Desbloquear"       SIZE 060, 020 PIXEL OF oDlgMain ACTION (fAltera(@oMSNewGet, nOpc := 2), oMSNewGet:Refresh())
+    @320,137 BUTTON "Alterar Limite"    SIZE 060, 020 PIXEL OF oDlgMain ACTION (fAltera(@oMSNewGet, nOpc := 3), oMSNewGet:Refresh())
+    @320,200 BUTTON "Salvar"            SIZE 060, 020 PIXEL OF oDlgMain ACTION (fAltera(@oMSNewGet, nOpc := 4), oMSNewGet:Refresh())
 
+    //Criação do grid para apresentação dos dados da Query
     oMSNewGet := MsNewGetDados():New(020, 000 , 300, 1000, GD_UPDATE, "AllwaysTrue", "AllwaysTrue","", aCmpAlt,, 999, "AllwaysTrue", "", "AllwaysTrue", oDlgMain, @aHeader, @aCols)
-
-
     oMSNewGet:oBrowse:BLDBLCLICK := {||fCheckfield(@oMSNewGet)}
     oDlgMain:Activate()
 
 Return()
 
 Static function fCarregaACols()
-    Local cLinha                := CHR(13) + CHR(10)
-    //Local aCols := {}
-    //Local aArea  := GetArea()
-    Local cQry   := ""
-    // Local nAtual := 0
-    // Local nTotal := 0
-    //Local oBmpAux
+    Local cLinha    := CHR(13) + CHR(10)
+    Local cQry      := ""
 
     cQry := " SELECT "                                                                                      + cLinha
     cQry += "     A1_COD, "                                                                                 + cLinha
@@ -145,12 +132,6 @@ Static function fCarregaACols()
 
 Return
 
-
-
-
-
-
-
 Static Function fCheckfield(oMSNewGet)
 
     Local nLine := oMSNewGet:nAt
@@ -166,23 +147,16 @@ Static Function fCheckfield(oMSNewGet)
     oMSNewGet:Refresh()
 Return
 
-
-
-
-
-
-
-
-
-Static Function fBloqueia(oMSNewGet, oDlgMain)
-    Local nLine := oMSNewGet:nAt
-    Local nColumn := aScan(oMSNewGet:aHeader, {|x| x[2] == 'CHECK'})
-    Local oCheck := oMSNewGet:aCols[nLine, nColumn]
-    Local aArea := GetArea()
+Static Function fAltera(oMSNewGet, nOpc)
     Local nAtual    := 0
     Local nSelecao  := 0
     Local nBloq     := 0
-     
+    Local nCont     
+    Local aPergsLC  := {}
+    Local nPergsLC  := 0
+    Local nValidLC  := 0
+    Local aNomes    := {}
+    Local cAvisoNomes := ""
 
 
     
@@ -196,34 +170,90 @@ Static Function fBloqueia(oMSNewGet, oDlgMain)
             nSelecao++
             dbSeek(xFilial("SA1") + aCols[nCont][3] + aCols[nCont][5])
             IF FOUND() 
-                IF oMSNewGet:aCols[nCont][2] = "1"
-                    FWAlertError('Cliente <b>' + RTRIM(SA1->A1_NREDUZ) +  '</b> já bloqueado.', 'Atenção')
-                ELSE
-                    //RecLock("SA1", .F.)
-                    oMSNewGet:aCols[nCont, 2] := "1"
+                IF nOpc == 1
+                    IF oMSNewGet:aCols[nCont][2] = "1"
+                        //FWAlertError('Cliente <b>' + RTRIM(SA1->A1_NREDUZ) +  '</b> já bloqueado.', 'Atenção')
+                        AADD(aNomes, {SA1->A1_NREDUZ})
+                    ELSE
+                        //RecLock("SA1", .F.)
+                        //SA1->A1_MSBLQL := "1"
+                        oMSNewGet:aCols[nCont][2] := "1"
+                        oMSNewGet:aCols[nCont][1] := oBmpNo
+                        //SA1->(MsUnlock())
+                        nBloq++
+                        //FWAlertInfo('Cliente ' + TRIM((cAliasTemp)->NREDUZ) + ' bloqueado.', 'Atenção!')
+                    ENDIF
+                ELSEIF nOpc == 2
+                    IF oMSNewGet:aCols[nCont][2] = "2"
+                        AADD(aNomes,{SA1->A1_NREDUZ})
+                        //FWAlertError('Cliente <b>' + RTRIM(SA1->A1_NREDUZ) +  '</b> já desbloqueado.', 'Atenção')
+                    ELSE
+                        //RecLock("SA1", .F.)
+                        //SA1->A1_MSBLQL := "2"
+                        oMSNewGet:aCols[nCont][2] := "2"
+                        oMSNewGet:aCols[nCont][1] := oBmpNo
+                        //SA1->(MsUnlock())
+                        nBloq++
+                        //FWAlertInfo('Cliente ' + TRIM((cAliasTemp)->NREDUZ) + ' bloqueado.', 'Atenção!')
+                    ENDIF
+                ELSEIF nOpc == 3
+                    aAdd(aPergsLC, {1, "Limite de crédito: ",             nPergsLC,           "@E 9 999,999.99",  ".T.",  "",     ".T.", 80,  .T.})
+                    while nValidLC = 0
+                        IF ParamBox(aPergsLC, "Informe os parâmetros")
+                            IF FWAlertNoYes("Confirma os dados inseridos?", "Continuar?")
+                                IF MV_PAR01 <= 0
+                                    FWAlertInfo('Valor de limite não pode ser menor que <b>0!</b><br>Insira um valor válido.', 'Atenção!')
+                                ELSE
+                                    nPergsLC            := MV_PAR01
+                                    nValidLC            := 1
+                                ENDIF
+                            ELSE    
+                                nValidLC := 0
+                            ENDIF
+                        ELSE
+                            Return
+                        EndIf
+                    End
+
+                    //Reclock("SA1", .F.)
+                    //SA1->A1_LC := nPergsLC
+                    oMSNewGet:aCols[nCont][6] := nPergsLC
+                    oMSNewGet:aCols[nCont][1] := oBmpNo
                     //SA1->(MsUnlock())
-                    nBloq++
+                ELSEIF nOpc == 4
+                    RecLock("SA1", .F.)
+                    SA1->A1_LC      := oMSNewGet:aCols[nCont][6]
+                    SA1->A1_MSBLQL  := oMSNewGet:aCols[nCont][2]
+                    oMSNewGet:aCols[nCont][1] := oBmpNo
+                    SA1->(MsUnlock())
                     //FWAlertInfo('Cliente ' + TRIM((cAliasTemp)->NREDUZ) + ' bloqueado.', 'Atenção!')
+                ELSE
+                    FWAlertInfo('Error')
                 ENDIF
             ENDIF
         EndIf
         SA1->(DbSkip())
     NEXT
 
+    //
+    For nNomes := 1 TO Len(aNomes)
+        cAvisoNomes := RTRIM(cAvisoNomes) + CHR(13) + CHR(10) + RTRIM(aNomes[nNomes][1])
+
+    NEXT
+
+    IF Len(aNomes) != 0
+        FWAlertInfo("<b>" + cAvisoNomes + "</b>", "Atenção! <br>Clientes já bloqueados/desbloqueados: ")
+    ENDIF
     //Caso não tenha sido marcado nenhum registro, informar o usuário
     IF nSelecao = 0
         FWAlertInfo('Selecione ao menos um registro.')
     ENDIF
 
-    IF nBloq = 0
-        FWAlertInfo('Nenhum cliente foi bloqueado.', 'Atenção!')
-    ELSE
-        FWAlertInfo('Registro(s) bloqueado(s)', 'Bloqueado(s)!')
-    ENDIF     
+    // IF nBloq = 0
+    //     FWAlertInfo('Nenhum cliente foi bloqueado.', 'Atenção!')
+    // ELSE
+    //     FWAlertInfo('Registro(s) bloqueado(s)', 'Bloqueado(s)!')
+    // ENDIF     
 
-    //Posiciona no topo da tabela temporária
     SA1->(DbGoTop())
-    //Faz a atualização da MarkBrowse
-
-
 Return
