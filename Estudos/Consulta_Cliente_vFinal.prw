@@ -155,7 +155,8 @@ Static Function fCheckfield(oMSNewGet)
 RETURN
 
 //Função que marca/desmarca todos os registros do grid de acordo com o parâmetro passado
-//1- Marcar todos | 2- Desmarcar todos
+// [1] Marcar todos
+// [2] Desmarcar todos
 Static Function fMarcaDesmarca(nMarcaDesmarca, oMSNewGet, aCols)
     Local nX
 
@@ -184,20 +185,23 @@ Static Function fPesquisa(oMSNewGet, nOpc, c_ChavIden, aCols)
     oMSNewGet:Refresh()
 Return
 
-
-
+//Função responsável pelas alterações de bloqueio, desbloqueio, limite de crédito e data de vencimento de limite de crédito dos clientes apresentados no grid.
+// [1] Bloqueio
+// [2] Desbloqueio
+// [3] Alteração de limite de crédito
+// [4] Alteração de vencimento do limite de crédito
 Static Function fAltera(oMSNewGet, nOpc, aCols)
 
+    Local nCont         := 0                    //Contador do laço
     Local nSelecao      := 0                    //Validação se algum registro foi selecionado
-    Local aPergsLC      := {}                   //Array contendo as perguntas de Limite de Crédito
     Local nPergsLC      := 0                    //Variável criada para receber o MV_PAR01 de aPergsLC
+    Local aPergsLC      := {}                   //Array contendo as perguntas de Limite de Crédito
     Local aPergsVenc    := {}                   //Array contendo as perguntas de Vencimento de Limite de crédito
     Local cPergsVenc    := FIRSTDATE(DATE())    //Variável que recebe o valor de MV_PAR01 de aPergsVenc
     Local lValidBlq     := .F.                  //Validação de informações - Bloqueio
     Local lValidDsblq   := .F.                  //Validação de informações - Desbloqueio
     Local lValidLC      := .F.                  //Validação de informações - Limite de crédito
     Local lValidVenc    := .F.                  //Validação de informações - Vencimento de limite de crédito
-    Local nCont         := 0                    //Contador do laço
 
     //Alimentação dos arrays de perguntas de validações 
     aAdd(aPergsLC,   {1, "Limite de crédito: ",   nPergsLC,   "@E 9 999,999.99",  ".T.", "", ".T.", 80, .T.})
@@ -206,24 +210,17 @@ Static Function fAltera(oMSNewGet, nOpc, aCols)
     dbSelectArea("SA1")
     dbSetOrder(1) // A1_FILIAL + A1_COD + A1_LOJA
 
+    //Início do loop que percorre todos os registros do grid
     For nCont := 1 to Len(aCols)
         //Verifica se o registro posicionado está marcado 
         IF (oMSNewGet:aCols[nCont][1] = oBmpOK)
             nSelecao++
             dbSeek(xFilial("SA1") + aCols[nCont][3] + aCols[nCont][5])
             IF FOUND() 
-                IF nOpc == 1
+                IF nOpc == 1 
                     WHILE lValidBlq = .F.
                         IF FWAlertNoYes("Confirma o <b>BLOQUEIO</b> de todos os clientes selecionados?", "Atenção!")
-                            //IF oMSNewGet:aCols[nCont][2] = "1"
-                                //FWAlertError('Cliente <b>' + RTRIM(SA1->A1_NREDUZ) +  '</b> já bloqueado.', 'Atenção')
-                                //AADD(aNomes, {SA1->A1_NREDUZ})
-                                //Return
-                            //ELSE
                             lValidBlq := .T.
-                                //nBloq++
-                                //FWAlertInfo('Cliente ' + TRIM((cAliasTemp)->NREDUZ) + ' bloqueado.', 'Atenção!')
-                            //ENDIF
                         ELSE
                             lValidBlq = .F.
                             RETURN
@@ -231,14 +228,13 @@ Static Function fAltera(oMSNewGet, nOpc, aCols)
                     EndDo
                     RecLock("SA1", .F.)
                     SA1->A1_MSBLQL := "1"
-                    //oMSNewGet:aCols[nCont][9] := .T.
                     SA1->(MsUnlock())
                     oMSNewGet:aCols[nCont][1] := oBmpNo
                     oMSNewGet:aCols[nCont][2] := "1"
                 ELSEIF nOpc == 2
                     WHILE lValidDsBlq = .F.
                         IF FWAlertNoYes("Confirma o <b>DESBLOQUEIO</b> de todos os clientes selecionados?", "Atenção!")
-                                lValidDsblq := .T.
+                            lValidDsblq := .T.
                         ELSE
                             lValidDsblq := .F.
                             RETURN
